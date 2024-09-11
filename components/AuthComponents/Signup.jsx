@@ -1,11 +1,25 @@
-import { View, Text, TextInput, Pressable, StyleSheet, Image } from 'react-native'
+import { View, Text, TextInput, Pressable, StyleSheet, Image, Button } from 'react-native'
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
+import { useAuth } from '../../context/AuthContext'
+import { useState } from 'react'
+import { useNavigation } from '@react-navigation/native'
 
 export default function Signup() {
+
+  const auth = useAuth()
+  const navigation = useNavigation()
+
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  const handleSignup = async (e) => {
+    await auth.register(email, password, username)
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Registrarse</Text>
-
 
       {/* Username Input */}
       <View style={styles.inputContainer}>
@@ -14,6 +28,7 @@ export default function Signup() {
           style={styles.input}
           placeholder="Nombre de usuario"
           placeholderTextColor="#ccc"
+          onChange={(e) => setUsername(e.nativeEvent.text)}
         />
       </View>
 
@@ -24,6 +39,7 @@ export default function Signup() {
           style={styles.input}
           placeholder="E-mail"
           placeholderTextColor="#ccc"
+          onChange={(e) => setEmail(e.nativeEvent.text)}
         />
       </View>
 
@@ -35,11 +51,12 @@ export default function Signup() {
           placeholder="Contraseña"
           secureTextEntry={true}
           placeholderTextColor="#ccc"
+          onChange={(e) => setPassword(e.nativeEvent.text)}
         />
       </View>
 
       {/* Login Button */}
-      <Pressable style={styles.loginButton}>
+      <Pressable style={styles.loginButton} onPress={handleSignup}>
         <Text style={styles.loginButtonText}>Ingresar</Text>
       </Pressable>
 
@@ -51,9 +68,12 @@ export default function Signup() {
       {/* Register */}
       <View style={styles.registerContainer}>
         <Text style={styles.registerText}>Ya tienes una cuenta? </Text>
-        <Pressable>
-          <Text style={styles.registerLink}>Inciar sesión</Text>
-        </Pressable>
+        <Pressable 
+          title='Iniciar sesión' 
+          onPress={() => navigation.navigate('Login')}
+          style={styles.registerText}>
+          <Text style={styles.registerLink}>Iniciar sesión</Text>
+        </Pressable>  
       </View>
     </View>
   );
@@ -130,5 +150,8 @@ const styles = StyleSheet.create({
   },
   registerLink: {
     color: '#a40990',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 5
   },
 });

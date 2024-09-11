@@ -4,10 +4,9 @@ import MovieContainer from '../components/MovieContainer'
 
 function HomeScreen () {
   return (
-    <ScrollView>
-      <Home />
+    <View>
       <MovieContainer />
-    </ScrollView>
+    </View>
   )
 }
 

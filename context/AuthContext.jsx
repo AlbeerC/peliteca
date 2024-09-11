@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { auth, db } from '../firebase/config'
 import { doc, setDoc } from "firebase/firestore"
-import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth'
+import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithRedirect, signOut } from 'firebase/auth'
 import * as SecureStore from 'expo-secure-store'
 
 const AuthContext = createContext()
@@ -13,7 +13,17 @@ function AuthProvider ( {children} ) {
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
-            setUser(user)
+            if (user) {
+                getUserFromSecureStore().then(storedUser => {
+                    if (storedUser) {
+                        setUser(storedUser)
+                    } else {
+                        setUser(user)
+                    }
+                })
+            } else {
+                setUser(null)
+            }
         })
 
         return () => unsubscribe()
@@ -30,13 +40,14 @@ function AuthProvider ( {children} ) {
     }, [])
 
     // Log in and sing up functions  
-    const register = async (email, password) => {
+    const register = async (email, password, username) => {
         try {
-            await createUserWithEmailAndPassword(auth, email, password)
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+            const user = userCredential.user
             setIsLogged(true)
             setError(null)
-            saveUserInSecureStore(auth.currentUser)
-            saveUserToFirestore(auth.currentUser)
+            saveUserInSecureStore(user, username)
+            saveUserToFirestore(user, username)
         } catch (error) {
             setError(`Error al registrar usuario: ${error.message}`)
         }
@@ -57,7 +68,7 @@ function AuthProvider ( {children} ) {
     const loginWithGoogle = async () => {
         try {
             const provider = new GoogleAuthProvider()
-            await signInWithPopup(auth, provider)
+            await signInWithRedirect(auth, provider)
             setIsLogged(true)
             setError(null)
             saveUserInSecureStore(auth.currentUser)
@@ -93,9 +104,10 @@ function AuthProvider ( {children} ) {
         return user ? user.uid : null
     }
 
-    const saveUserInSecureStore = async (user) => {
+    const saveUserInSecureStore = async (user, username) => {
         try {
-            await SecureStore.setItemAsync('user', JSON.stringify(user))
+            const userData = {...user, username}
+            await SecureStore.setItemAsync('user', JSON.stringify(userData))
         } catch (error) {
             setError("Error saving user in secureStore:", error)
         }
@@ -103,10 +115,11 @@ function AuthProvider ( {children} ) {
 
     const getUserFromSecureStore = async () => {
         try {
-            const storedUser = SecureStore.getItemAsync('user')
+            const storedUser = await SecureStore.getItemAsync('user')
             return storedUser ? JSON.parse(storedUser) : null
         } catch (error) {
             setError("Error getting user from secureStore:", error)
+            return null
         }
     }
 
@@ -118,13 +131,18 @@ function AuthProvider ( {children} ) {
         }
     }
 
-    const saveUserToFirestore = async (user) => {
+    const saveUserToFirestore = async (user, username) => {
         try {
             const userId = getUserId()
             const userRef = doc(db, "users", userId)
 
+            if (typeof user.email !== 'string' || typeof username !== 'string') {
+                throw new Error('Invalid data types for email or username')
+            }
+
             await setDoc(userRef, {
-                email: user.email
+                email: user.email,
+                username
             })
         } catch (error) {
             console.error("Error saving user in Firestore:", error)

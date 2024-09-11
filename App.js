@@ -6,7 +6,6 @@ import ProfileScreen from './screens/ProfileScreen'
 import AuthProvider from './context/AuthContext'
 import { HomeIcon, SearchIcon, UserIcon } from './components/Icons'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
-
 const Tab = createBottomTabNavigator()
 
 function App () {

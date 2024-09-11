@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Text, View, Image } from 'react-native'
+import Home from './Home'
+import { Text, View, Image, FlatList } from 'react-native'
 
 function MovieContainer () {
 
@@ -17,15 +18,17 @@ function MovieContainer () {
     }
     
     return (
-        <View style={styles.container}>
-            <Text>Novedades</Text>
-            {movies.map((movie) => (
-                <View key={movie.id}>
-                    <Text>{movie.title}</Text>
-                    <Image style={{width: 100, height: 150}} source={{uri: posterPath(movie.poster_path)}} />
+        <FlatList 
+            data={movies}
+            renderItem={({item}) => (
+                <View>
+                    <Text>{item.title}</Text>
+                    <Image style={{width: 100, height: 150}} source={{uri: posterPath(item.poster_path)}} />
                 </View>
-            ))}
-        </View>
+            )}
+            ListHeaderComponent={<Home />}
+            keyExtractor={(item) => item.id}
+        />
     )
 }
 
