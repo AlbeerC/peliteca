@@ -1,13 +1,19 @@
-import { View, Text, TextInput, Pressable, StyleSheet, Image } from 'react-native'
+import { View, Text, TextInput, Pressable, StyleSheet, Image, Button } from 'react-native'
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
 import { useAuth } from '../../context/AuthContext'
+import { useState } from 'react'
+import { useNavigation } from '@react-navigation/native'
 
 export default function Login() {
   
   const auth = useAuth()
+  const navigation = useNavigation()
 
-  const handleLoginWithGoogle = () => {
-    auth.loginWithGoogle()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  
+  const handleLogin = async (e) => {
+    await auth.login(email, password)
   }
 
   return (
@@ -21,6 +27,7 @@ export default function Login() {
           style={styles.input}
           placeholder="E-mail"
           placeholderTextColor="#ccc"
+          onChange={(e) => setEmail(e.nativeEvent.text)}
         />
       </View>
 
@@ -32,6 +39,7 @@ export default function Login() {
           placeholder="Contraseña"
           secureTextEntry={true}
           placeholderTextColor="#ccc"
+          onChange={(e) => setPassword(e.nativeEvent.text)}
         />
       </View>
 
@@ -41,12 +49,12 @@ export default function Login() {
       </Pressable>
 
       {/* Login Button */}
-      <Pressable style={styles.loginButton}>
+      <Pressable style={styles.loginButton} onPress={handleLogin}>
         <Text style={styles.loginButtonText}>Ingresar</Text>
       </Pressable>
 
       {/* Google Login Button */}
-      <Pressable style={styles.googleButton} onPress={handleLoginWithGoogle}>
+      <Pressable style={styles.googleButton}>
         <Text style={styles.googleButtonText}>Ingresar con Google</Text>
       </Pressable>
 
@@ -55,7 +63,10 @@ export default function Login() {
       {/* Register */}
       <View style={styles.registerContainer}>
         <Text style={styles.registerText}>No tienes una cuenta? </Text>
-        <Pressable>
+        <Pressable
+          style={styles.resigterText}
+          title='Registrarse' 
+          onPress={() => navigation.navigate('Signup')}> 
           <Text style={styles.registerLink}>Registrarse</Text>
         </Pressable>
       </View>
@@ -140,5 +151,8 @@ const styles = StyleSheet.create({
   },
   registerLink: {
     color: '#a40990',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 5
   },
 });
