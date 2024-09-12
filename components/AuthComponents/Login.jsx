@@ -64,7 +64,7 @@ export default function Login() {
       <View style={styles.registerContainer}>
         <Text style={styles.registerText}>No tienes una cuenta? </Text>
         <Pressable
-          style={styles.resigterText}
+          style={styles.registerText}
           title='Registrarse' 
           onPress={() => navigation.navigate('Signup')}> 
           <Text style={styles.registerLink}>Registrarse</Text>

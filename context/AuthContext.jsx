@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { auth, db } from '../firebase/config'
-import { doc, setDoc } from "firebase/firestore"
+import { doc, setDoc, getDoc } from "firebase/firestore"
 import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithRedirect, signOut } from 'firebase/auth'
 import * as SecureStore from 'expo-secure-store'
 
@@ -59,7 +59,6 @@ function AuthProvider ( {children} ) {
             setIsLogged(true)
             setError(null)
             saveUserInSecureStore(auth.currentUser)
-            saveUserToFirestore(auth.currentUser)
         } catch (error) {
             setError(`Error al ingresar usuario: ${error.message}`)
         }
@@ -69,10 +68,14 @@ function AuthProvider ( {children} ) {
         try {
             const provider = new GoogleAuthProvider()
             await signInWithRedirect(auth, provider)
-            setIsLogged(true)
-            setError(null)
-            saveUserInSecureStore(auth.currentUser)
-            saveUserToFirestore(auth.currentUser)
+
+            if (getUser()) {
+                setIsLogged(true)
+                setError(null)
+                saveUserInSecureStore(auth.currentUser)
+                const username = auth.currentUser.displayName || 'GoogleUser'
+                saveUserToFirestore(auth.currentUser, username)
+            }
         } catch (error) {
             setError(`Error al ingresar con google: ${error.message}`)
         }
@@ -90,14 +93,41 @@ function AuthProvider ( {children} ) {
     }
 
     // Get user and SecureStore functions
-    const getUser = () => {
+
+    const getUser = async () => { 
         const currentUser = auth.currentUser
-        if (currentUser) {
-            return currentUser
-        } else {
+        if (!currentUser) {
             return null
         }
-    }
+    
+        try {
+            // Si el usuario tiene un displayName (por ejemplo, con Google), lo retornamos directamente
+            if (currentUser.displayName) {
+                return {
+                    email: currentUser.email,
+                    displayName: currentUser.displayName // Nombre de Google
+                }
+            }
+    
+            // Si no hay displayName, buscamos el username en Firestore
+            const userDocRef = doc(db, "users", currentUser.uid)
+            const userDoc = await getDoc(userDocRef)
+    
+            if (userDoc.exists()) {
+                // Retornamos el email y el username desde Firestore
+                return {
+                    email: currentUser.email,
+                    username: userDoc.data().username
+                }
+            } else {
+                console.error("No user data found in Firestore")
+                return currentUser
+            }
+        } catch (error) {
+            console.error("Error fetching user data from Firestore:", error)
+            return currentUser
+        }
+    }    
 
     const getUserId = () => {
         const user = getUser()
