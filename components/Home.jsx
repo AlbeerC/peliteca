@@ -1,25 +1,29 @@
 import { Text, ImageBackground, View, Image, Dimensions } from 'react-native'
+import FilterButttons from './FilterButtons'
 
 const { height, width } = Dimensions.get('window')
 
-function Home () {
+function Home ( {onFilterSelect, selectedFilter} ) {
     
     return (
-        <ImageBackground
-            style={homeStyles} 
-            source={require('../assets/images/batman-cover.jpg')}
-        >
-            <View style={homeStyles.overlay}>
-                <Text style={homeStyles.title}>Peliteca</Text>
+        <View>
+            <ImageBackground
+                style={homeStyles} 
+                source={require('../assets/images/batman-cover.jpg')}
+            >
+                <View style={homeStyles.overlay}>
+                    <Text style={homeStyles.title}>Peliteca</Text>
 
-                <View style={homeStyles.gifContainer}>
-                    <Image 
-                        source={require('../assets/images/scrolldown.gif')} 
-                        style={homeStyles.gif} 
-                    />
+                    <View style={homeStyles.gifContainer}>
+                        <Image 
+                            source={require('../assets/images/scrolldown.gif')} 
+                            style={homeStyles.gif} 
+                        />
+                    </View>
                 </View>
-            </View>
-        </ImageBackground>
+            </ImageBackground>
+            <FilterButttons onFilterSelect={onFilterSelect} selectedFilter={selectedFilter} />
+        </View>
     )
 }
 

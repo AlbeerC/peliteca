@@ -1,41 +1,83 @@
 import { useEffect, useState } from 'react'
 import Home from './Home'
-import { Text, View, Image, FlatList } from 'react-native'
+import { Text, View, Image, FlatList, Dimensions, StyleSheet, Pressable } from 'react-native'
+import { useApi } from '../context/ApiContext'
+import LoadMore from './LoadMore'
+import { useNavigation } from '@react-navigation/native'
+import Loading from './Loading'
 
 function MovieContainer () {
 
-    const [movies, setMovies] = useState([])
+    const navigation = useNavigation()
+    const api = useApi()
+    const { fetchMovies, movies, loading, getImageUrl } = api
+    const [selectedEndpoint, setSelectedEndpoint] = useState('popular')
+    const [page, setPage] = useState(1)
 
     useEffect(() => {
-        fetch("https://api.themoviedb.org/3/movie/top_rated?api_key=59a8b9ea3a6d0f0d1d790d8bb5f36d94")
-            .then((response) => response.json())
-            .then((data) => setMovies(data.results))
-            .catch((error) => console.log(error))
-    }, [])
+        setPage(1)
+    }, [selectedEndpoint])
 
-    const posterPath = (url) => {
-        return `https://image.tmdb.org/t/p/w92${url}`
+    useEffect(() => {
+        fetchMovies(selectedEndpoint, page)
+    }, [selectedEndpoint, page])
+
+    const loadMore = () => {
+        if (!loading) {
+            setPage(prevPage => prevPage + 1)
+        }
+    }
+
+    const handleFilterSelect = (filter) => {
+        setSelectedEndpoint(filter)
+    }
+
+
+    const goToDetail = (movieId) => {
+        navigation.navigate('MovieDetail', {id: movieId})
+    }
+
+    if (loading) {
+        return <Loading />
     }
     
     return (
         <FlatList 
             data={movies}
+            numColumns={3}
             renderItem={({item}) => (
-                <View>
-                    <Text>{item.title}</Text>
-                    <Image style={{width: 100, height: 150}} source={{uri: posterPath(item.poster_path)}} />
+                <View style={styles.itemContainer}>
+                    <Pressable onPress={() => goToDetail(item.id)}>
+                        <Image 
+                            style={styles.itemImage} 
+                            source={{uri: getImageUrl(item.poster_path)}} 
+                        />
+                    </Pressable>
                 </View>
             )}
-            ListHeaderComponent={<Home />}
+            ListHeaderComponent={<Home
+                onFilterSelect={handleFilterSelect} selectedFilter={selectedEndpoint}/> }
+            ListFooterComponent={<LoadMore loadMore={loadMore} />}
             keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.container}
         />
     )
 }
 
 export default MovieContainer
 
-const styles = {
+const styles = StyleSheet.create({
     container: {
-        height: '100%'
+        paddingBottom: 20
+    },
+    itemContainer: {
+        flex: 1,
+        padding: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    itemImage: {
+        width: 120,
+        height: 180,
     }
-}
+})

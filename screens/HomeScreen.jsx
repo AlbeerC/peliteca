@@ -1,12 +1,16 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native'
-import Home from '../components/Home'
-import MovieContainer from '../components/MovieContainer'
+import MainMovieList from '../components/MainMovieList'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import DetailScreen from './DetailScreen'
+
+const Stack = createNativeStackNavigator()
 
 function HomeScreen () {
   return (
-    <View>
-      <MovieContainer />
-    </View>
+      <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Screen name="Movies" component={MainMovieList} />
+        <Stack.Screen name="MovieDetail" component={DetailScreen}/>
+      </Stack.Navigator>
   )
 }
 

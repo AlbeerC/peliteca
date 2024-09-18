@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react'
 function Dashboard () {
 
     const auth = useAuth()
-    const [username, setUsername] = useState('')
-
+    const [username, setUsername] = useState()
+    
     useEffect(() => {
         const fetchUser = async () => {
             const user = await auth.getUser()
@@ -16,7 +16,7 @@ function Dashboard () {
         } 
         fetchUser()
     }, [])
-
+    
     const handleLogout = async () => {
         await auth.logout()
     }
