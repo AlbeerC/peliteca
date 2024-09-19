@@ -1,7 +1,7 @@
-import { View, TextInput, StyleSheet, Pressable } from 'react-native'
+import { View, TextInput, StyleSheet, Pressable, Text } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useState } from 'react'
-
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 function SearchBar() {
 
@@ -17,7 +17,8 @@ function SearchBar() {
 
     return (
         <View style={styles.searchContainer}>
-            <Pressable onPress={handleSearch}>
+            <Pressable onPress={handleSearch} className='px-2'>
+                <FontAwesome name="search" size={24} color="#3A3A3A" />
             </Pressable>
             <TextInput
                 style={styles.input}
@@ -37,9 +38,9 @@ const styles = StyleSheet.create({
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 10,
-        backgroundColor: '#f0f0f0',
+        margin: 15,
         borderRadius: 5,
+        backgroundColor: '#fff',
     },
     input: {
         flex: 1,

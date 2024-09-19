@@ -36,10 +36,6 @@ function MovieContainer () {
     const goToDetail = (movieId) => {
         navigation.navigate('MovieDetail', {id: movieId})
     }
-
-    if (loading) {
-        return <Loading />
-    }
     
     return (
         <FlatList 

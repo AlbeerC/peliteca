@@ -5,7 +5,7 @@ import { View, Text } from "react-native"
 function MainMovieList () {
 
     return (
-        <View>
+        <View style={{backgroundColor: '#3A3A3A'}}>
             <MovieContainer />
         </View>
     )

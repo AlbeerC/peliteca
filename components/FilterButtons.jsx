@@ -36,6 +36,7 @@ const styles = {
     text: {
         fontSize: 17,
         fontWeight: 'bold',
+        color: '#ffffff',
     },
     buttonActive: {
         color: '#a40990',

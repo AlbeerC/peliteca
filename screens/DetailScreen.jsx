@@ -3,6 +3,7 @@ import { useRoute } from '@react-navigation/native'
 import { useEffect, useState } from 'react'
 import { View, Text } from 'react-native'
 import MovieDetail from '../components/MovieDetail'
+import Loading from '../components/Loading'
 
 function DetailScreen () {
 
@@ -16,7 +17,7 @@ function DetailScreen () {
     }, [id])
 
     if (loading || !movieDetails) {
-        return <Text>Loading...</Text>
+        return <Loading />
     }
 
     return (

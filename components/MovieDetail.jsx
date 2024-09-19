@@ -1,9 +1,15 @@
-import { View, Text, Image, ImageBackground } from 'react-native'
+import { View, Text, Image, Pressable } from 'react-native'
 import { useApi } from '../context/ApiContext'
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 import { LinearGradient } from 'expo-linear-gradient'
+import { useAuth } from '../context/AuthContext'
+/* import { addToWatchList, addToWatched, addToTop5 } from '../helpers/firestore' */
 
 function MovieDetail ( {movie} ) {
+
+    const auth = useAuth()
+    const isLogged = auth.isLogged
+    const userId = auth.getUserId()
 
     const api = useApi()
     const { getBackdropUrl } = api
@@ -61,12 +67,19 @@ function MovieDetail ( {movie} ) {
     
         return starIcons
     }
-    
 
     return (
         <View style={styles.container}>
             <View style={styles.backdropContainer}>
                 <Image source={{uri: backdrop}} style={styles.backdrop} />
+                {
+                isLogged && 
+                    <View>
+                        <Pressable>
+                            <Text>asd</Text>
+                        </Pressable>
+                    </View>
+                }
                 <LinearGradient
                     colors={['transparent', 'rgba(0, 0, 0, 0.7)']} // Degradado de transparente a negro
                     style={styles.gradient}
